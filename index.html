@@ -3,10 +3,10 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no" />
-<title>Lido FM</title>
+<title>Sundeck</title>
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-<meta name="apple-mobile-web-app-title" content="Lido FM" />
+<meta name="apple-mobile-web-app-title" content="Sundeck" />
 <meta name="theme-color" content="#efe6d3" />
 <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' rx='40' fill='%23efe6d3'/%3E%3Crect x='28' y='62' width='124' height='78' rx='12' fill='%23161210'/%3E%3Ccircle cx='66' cy='101' r='17' fill='none' stroke='%23ffb65a' stroke-width='4'/%3E%3Ccircle cx='118' cy='101' r='17' fill='none' stroke='%23ffb65a' stroke-width='4'/%3E%3C/svg%3E" />
 <script src="https://sdk.scdn.co/spotify-player.js"></script>
@@ -58,10 +58,9 @@
   .sqbtn:active{transform:translate(2px,2px);box-shadow:0 0 0 var(--ink);}
   .sqbtn.on{background:var(--amber);}
   .sqbtn svg{display:block;}
-  .wordmark{flex:1;display:flex;align-items:baseline;justify-content:center;gap:8px;}
-  .wordmark .logo{font-family:'DM Serif Display',serif;font-size:34px;letter-spacing:1px;line-height:.9;transform:scaleY(1.15);}
-  .wordmark .fm{font-family:'DM Serif Display',serif;font-style:italic;font-size:15px;
-    border:2px solid var(--ink);border-radius:999px;padding:1px 7px;transform:translateY(-4px);}
+  .wordmark{flex:1;display:flex;align-items:baseline;justify-content:center;gap:1px;}
+  .wordmark .logo{font-family:'VT323',monospace;font-size:42px;letter-spacing:1px;line-height:.85;}
+  .wordmark .fm{font-family:'VT323',monospace;font-size:30px;color:var(--amber-dim);line-height:.85;}
   .toprt{display:flex;align-items:center;gap:8px;}
   .led{width:11px;height:11px;border-radius:50%;background:#7a2a18;box-shadow:inset 0 0 3px #000;flex:0 0 auto;}
   .led.on{background:var(--led);box-shadow:0 0 9px var(--led),0 0 3px #fff inset;}
@@ -166,7 +165,8 @@
   .overlay{position:fixed;inset:0;z-index:20;display:flex;align-items:center;justify-content:center;padding:20px;
     background:var(--paper);background-image:radial-gradient(120% 80% at 50% 0%, #f6f0e2 0%, var(--paper) 60%, var(--paper2) 100%);}
   .card{width:min(440px,100%);background:var(--paper3);border:2.5px solid var(--ink);border-radius:20px;padding:24px;box-shadow:6px 7px 0 var(--ink);}
-  .card .logo{font-family:'DM Serif Display',serif;font-size:38px;text-align:center;transform:scaleY(1.15);margin:2px 0;}
+  .card .logo{font-family:'VT323',monospace;font-size:52px;text-align:center;letter-spacing:1px;line-height:.9;margin:2px 0;}
+  .card .logo .fm{color:var(--amber-dim);}
   .card .lead{font-size:16px;color:var(--ink2);line-height:1.4;margin:10px 0 18px;text-align:center;}
   .btn{width:100%;background:var(--amber);color:var(--ink);border:2px solid var(--ink);border-radius:12px;padding:14px;
     font-family:'VT323',monospace;font-size:21px;letter-spacing:1px;cursor:pointer;box-shadow:4px 4px 0 var(--ink);}
@@ -186,7 +186,7 @@
 
   <div class="topbar">
     <button class="sqbtn" id="gearBtn" title="Settings">&#9881;</button>
-    <div class="wordmark"><span class="logo">LIDO</span><span class="fm">fm</span></div>
+    <div class="wordmark"><span class="logo">SUNDECK</span><span class="fm">.fm</span></div>
     <div class="toprt">
       <button class="sqbtn" id="playToggle" title="Play / pause"><span class="led" id="led"></span>
         <svg width="16" height="13" viewBox="0 0 16 13" fill="none" stroke="#1c1813" stroke-width="1.6"><rect x="1" y="1" width="14" height="9" rx="1.5"/><path d="M5 12h6"/></svg></button>
@@ -211,11 +211,11 @@
       <div class="footstrip"><span class="dot"></span><span class="ln"></span><span class="dot"></span><span class="ln"></span><span class="dot"></span></div>
     </div>
 
-    <button class="sourcebar" id="sourceBar"><span class="lbl">Source:&nbsp;<b id="sourceLabel">Lido FM</b></span><span class="caret">&#9662;</span></button>
+    <button class="sourcebar" id="sourceBar"><span class="lbl">Source:&nbsp;<b id="sourceLabel">Sundeck</b></span><span class="caret">&#9662;</span></button>
 
     <div class="nprow">
       <div class="np">
-        <div class="title" id="npTitle">LIDO FM</div>
+        <div class="title" id="npTitle">SUNDECK</div>
         <div class="artist" id="npArtist">connect spotify to begin</div>
         <div class="progress"><span id="curTime">0:00</span>
           <div class="bar" id="seekBar"><div class="fill" id="seekFill"></div><div class="knob" id="seekKnob"></div></div>
@@ -260,7 +260,7 @@
 
 <div class="overlay" id="overlay">
   <div class="card">
-    <div class="logo">LIDO&nbsp;<span style="font-style:italic;font-size:24px;">fm</span></div>
+    <div class="logo">SUNDECK<span class="fm">.fm</span></div>
     <p class="lead">A summer hi-fi for your Spotify.<br>Tap connect, approve on Spotify, and your music takes over the deck.</p>
     <button class="btn" id="connectBtn">&#9835;&nbsp;&nbsp;Connect Spotify</button>
     <p style="font-size:11px;color:#8a7c64;text-align:center;margin-top:14px;line-height:1.45;">Spotify Premium required for full playback. You'll be sent to Spotify to approve, then bounced right back here.</p>
@@ -330,8 +330,8 @@ async function api(path,opts={}){
 window.onSpotifyWebPlaybackSDKReady=()=>{};
 function initPlayer(){
   if(player) return;
-  player=new Spotify.Player({name:"Lido FM",getOAuthToken:cb=>ensureToken().then(()=>cb(token)),volume:0.85});
-  player.addListener("ready",({device_id})=>{ deviceId=device_id; transferPlayback(false); toast("Lido FM is ready ☀"); });
+  player=new Spotify.Player({name:"Sundeck",getOAuthToken:cb=>ensureToken().then(()=>cb(token)),volume:0.85});
+  player.addListener("ready",({device_id})=>{ deviceId=device_id; transferPlayback(false); toast("Sundeck is ready ☀"); });
   player.addListener("not_ready",()=>{ deviceId=null; });
   player.addListener("initialization_error",({message})=>toast("Init error: "+message));
   player.addListener("authentication_error",()=>{ toast("Auth expired — reconnecting"); refreshToken(); });
@@ -356,7 +356,7 @@ function setNowPlaying(tr){
   $("npArtist").textContent=(tr.artists||[]).map(a=>a.name).join(", ");
   const url=tr.album&&tr.album.images&&tr.album.images[0]&&tr.album.images[0].url;
   if(url) $("artWrap").innerHTML=`<img src="${url}" alt="art" />`;
-  document.title=tr.name+" — Lido FM";
+  document.title=tr.name+" — Sundeck";
 }
 async function transferPlayback(play){ if(!deviceId) return; try{ await api("/me/player",{method:"PUT",body:JSON.stringify({device_ids:[deviceId],play:!!play})}); }catch(e){} }
 
