@@ -424,7 +424,7 @@ function openDrawer(tab){
   else if(tab==="library") loadLibrary();
   else if(tab==="search"){ $("drawerBody").innerHTML='<div class="muted">Type to search Spotify ☀</div>'; setTimeout(()=>$("searchInput").focus(),300); }
 }
-function closeDrawer(){ $("drawer").classList.remove("open"); }
+function closeDrawer(){ $("drawer").classList.remove("open"); currentTab="player"; document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.tab==="player")); }
 function rowHtml(img,name,sub,icon){ const art=img?`<img src="${img}" alt="">`:`<div class="ph">${icon||"♪"}</div>`; return `<div class="row">${art}<div class="info"><div class="n">${esc(name)}</div><div class="s">${esc(sub)}</div></div></div>`; }
 function esc(s){ return (s||"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
 
