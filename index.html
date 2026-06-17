@@ -4,25 +4,20 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no" />
 <title>Lido FM</title>
-
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 <meta name="apple-mobile-web-app-title" content="Lido FM" />
 <meta name="theme-color" content="#efe6d3" />
 <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' rx='40' fill='%23efe6d3'/%3E%3Crect x='28' y='62' width='124' height='78' rx='12' fill='%23161210'/%3E%3Ccircle cx='66' cy='101' r='17' fill='none' stroke='%23ffb65a' stroke-width='4'/%3E%3Ccircle cx='118' cy='101' r='17' fill='none' stroke='%23ffb65a' stroke-width='4'/%3E%3C/svg%3E" />
-
 <script src="https://sdk.scdn.co/spotify-player.js"></script>
-
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Archivo+Black&family=VT323&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-
 <style>
   :root{
     --paper:#efe6d3; --paper2:#e6dabf; --paper3:#f6f0e2; --white:#fbf7ee;
-    --ink:#1c1813; --ink2:#3a3026;
-    --panel:#171310; --panel2:#241d17;
-    --amber:#ffb65a; --amber-dim:#c98b3f; --led:#ff5630; --pink:#f3c7cf;
+    --ink:#1c1813; --ink2:#3a3026; --panel:#171310; --panel2:#241d17;
+    --amber:#ffb65a; --amber-dim:#c98b3f; --led:#ff5630; --pink:#f3c7cf; --like:#d4537e;
   }
   *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
   html,body{height:100%;margin:0;}
@@ -31,102 +26,109 @@
     background:var(--paper);
     background-image:radial-gradient(120% 70% at 50% 0%, #f6f0e2 0%, var(--paper) 55%, var(--paper2) 100%);
     background-attachment:fixed;
-    overflow-x:hidden; overflow-y:auto; -webkit-font-smoothing:antialiased; user-select:none;
+    position:fixed; inset:0; width:100%; height:100%;
+    overflow:hidden; overscroll-behavior:none;
+    -webkit-font-smoothing:antialiased; user-select:none;
   }
   .grain{position:fixed;inset:0;z-index:1;pointer-events:none;opacity:.045;
     background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");}
-
-  .app{position:relative;z-index:2;min-height:100%;max-width:440px;margin:0 auto;
-    display:flex;flex-direction:column;padding:env(safe-area-inset-top) 15px env(safe-area-inset-bottom);}
+  .app{position:relative;z-index:2;height:100%;max-width:440px;margin:0 auto;overflow:hidden;
+    display:flex;flex-direction:column;padding:env(safe-area-inset-top) 14px env(safe-area-inset-bottom);}
 
   /* status bar */
   .statusbar{display:flex;align-items:center;justify-content:space-between;
-    padding:11px 2px 8px;font-family:'VT323',monospace;font-size:21px;line-height:1;}
+    padding:5px 2px 3px;font-family:'VT323',monospace;font-size:19px;line-height:1;}
   .statusbar .left{display:flex;align-items:center;gap:8px;}
   .statusbar .right{display:flex;align-items:center;gap:9px;}
-  .bell{font-size:14px;opacity:.75;}
-  .sig{display:flex;align-items:flex-end;gap:2px;height:13px;}
+  .bell{font-size:13px;opacity:.75;}
+  .sig{display:flex;align-items:flex-end;gap:2px;height:12px;}
   .sig i{width:3px;background:var(--ink);display:block;border-radius:1px;}
-  .sig i:nth-child(1){height:5px}.sig i:nth-child(2){height:8px}.sig i:nth-child(3){height:11px}.sig i:nth-child(4){height:13px;opacity:.3}
-  .wifi{font-size:14px;}
+  .sig i:nth-child(1){height:4px}.sig i:nth-child(2){height:7px}.sig i:nth-child(3){height:10px}.sig i:nth-child(4){height:12px;opacity:.3}
+  .wifi{font-size:13px;}
   .batt{display:inline-flex;align-items:center;border:2px solid var(--ink);border-radius:5px;
-    padding:1px 5px;font-size:14px;position:relative;min-width:30px;justify-content:center;
+    padding:1px 5px;font-size:13px;position:relative;min-width:30px;justify-content:center;
     background:linear-gradient(90deg,var(--amber) 60%,transparent 60%);}
   .batt::after{content:"";position:absolute;right:-4px;top:5px;bottom:5px;width:2px;background:var(--ink);border-radius:1px;}
 
-  /* top bar: gear / wordmark / toggle */
-  .topbar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:2px 0 12px;}
-  .sqbtn{width:46px;height:42px;border:2px solid var(--ink);border-radius:11px;background:var(--paper3);
-    box-shadow:2px 2px 0 var(--ink);display:flex;align-items:center;justify-content:center;font-size:17px;color:var(--ink);cursor:pointer;flex:0 0 auto;}
+  /* top bar */
+  .topbar{display:flex;align-items:center;gap:8px;margin:0 0 6px;}
+  .sqbtn{height:40px;min-width:44px;border:2px solid var(--ink);border-radius:11px;background:var(--paper3);
+    box-shadow:2px 2px 0 var(--ink);display:flex;align-items:center;justify-content:center;gap:6px;
+    color:var(--ink);cursor:pointer;flex:0 0 auto;padding:0 10px;}
   .sqbtn:active{transform:translate(2px,2px);box-shadow:0 0 0 var(--ink);}
-  .wordmark{flex:1;display:flex;align-items:baseline;justify-content:center;gap:9px;}
-  .wordmark .logo{font-family:'DM Serif Display',serif;font-size:38px;letter-spacing:1px;line-height:.9;transform:scaleY(1.15);}
-  .wordmark .fm{font-family:'DM Serif Display',serif;font-style:italic;font-size:16px;
-    border:2px solid var(--ink);border-radius:999px;padding:1px 8px;transform:translateY(-5px);}
-  .toggle{display:flex;align-items:center;gap:7px;border:2px solid var(--ink);border-radius:11px;
-    padding:6px 9px;background:var(--paper3);box-shadow:2px 2px 0 var(--ink);height:42px;flex:0 0 auto;}
-  .led{width:11px;height:11px;border-radius:50%;background:#7a2a18;box-shadow:inset 0 0 3px #000;}
+  .sqbtn.on{background:var(--amber);}
+  .sqbtn svg{display:block;}
+  .wordmark{flex:1;display:flex;align-items:baseline;justify-content:center;gap:8px;}
+  .wordmark .logo{font-family:'DM Serif Display',serif;font-size:34px;letter-spacing:1px;line-height:.9;transform:scaleY(1.15);}
+  .wordmark .fm{font-family:'DM Serif Display',serif;font-style:italic;font-size:15px;
+    border:2px solid var(--ink);border-radius:999px;padding:1px 7px;transform:translateY(-4px);}
+  .toprt{display:flex;align-items:center;gap:8px;}
+  .led{width:11px;height:11px;border-radius:50%;background:#7a2a18;box-shadow:inset 0 0 3px #000;flex:0 0 auto;}
   .led.on{background:var(--led);box-shadow:0 0 9px var(--led),0 0 3px #fff inset;}
-  .toggle .tv{font-size:15px;}
 
-  .stage{display:flex;flex-direction:column;gap:11px;padding-bottom:14px;}
+  .stage{flex:1;min-height:0;overflow:hidden;display:flex;flex-direction:column;gap:7px;padding-bottom:5px;}
 
-  /* black hi-fi panel with big cover */
+  /* deck */
   .hifi{background:linear-gradient(180deg,#1c1712,#120e0a);border:2.5px solid var(--ink);border-radius:18px;
-    box-shadow:5px 6px 0 var(--ink), inset 0 1px 0 rgba(255,255,255,.05);padding:12px 12px 10px;}
-  .orn{width:100%;height:34px;display:block;margin-bottom:7px;}
-  .badges{display:flex;align-items:center;justify-content:center;gap:9px;margin-bottom:9px;}
-  .badge{display:flex;align-items:center;justify-content:center;height:22px;min-width:34px;padding:0 8px;
+    box-shadow:5px 6px 0 var(--ink), inset 0 1px 0 rgba(255,255,255,.05);padding:9px 11px 7px;
+    flex:1;min-height:0;display:flex;flex-direction:column;}
+  .orn{width:100%;height:26px;display:block;margin-bottom:5px;}
+  .badges{display:flex;align-items:center;justify-content:center;gap:9px;margin-bottom:6px;}
+  .badge{display:flex;align-items:center;justify-content:center;height:20px;min-width:32px;padding:0 7px;
     border:1.5px solid #6a5a44;border-radius:6px;}
   .badge.hl{background:#e7d7b6;border-color:#e7d7b6;}
   .badge svg{display:block;}
-
-  .cover{position:relative;width:100%;aspect-ratio:1/1;border:2px solid #000;border-radius:8px;overflow:hidden;
+  .cover{position:relative;width:100%;flex:1;min-height:0;border:2px solid #000;border-radius:8px;overflow:hidden;
     background:radial-gradient(120% 120% at 50% 30%, #2a2017, #110d09);box-shadow:inset 0 0 24px rgba(0,0,0,.7);}
   .cover img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
   .cover::after{content:"";position:absolute;inset:0;pointer-events:none;
-    background-image:radial-gradient(rgba(0,0,0,.5) 0.6px, transparent 0.7px);background-size:3px 3px;
-    mix-blend-mode:multiply;opacity:.45;}
+    background-image:radial-gradient(rgba(0,0,0,.5) 0.6px, transparent 0.7px);background-size:3px 3px;mix-blend-mode:multiply;opacity:.45;}
   .cover .ph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;}
-  .cover .ph .mk{font-family:'DM Serif Display',serif;font-size:40px;color:#5a4a35;letter-spacing:2px;transform:scaleY(1.15);opacity:.6;}
-  .footstrip{display:flex;align-items:center;gap:6px;margin-top:9px;padding:0 2px;}
+  .cover .ph .mk{font-family:'DM Serif Display',serif;font-size:40px;color:#5a4a35;transform:scaleY(1.15);opacity:.6;}
+  .footstrip{display:flex;align-items:center;gap:6px;margin-top:4px;padding:0 2px;}
   .footstrip .ln{flex:1;height:0;border-top:1.5px dotted #5a4a35;opacity:.7;}
   .footstrip .dot{width:5px;height:5px;border-radius:50%;background:#5a4a35;}
 
-  /* now playing card */
-  .np{background:var(--white);border:2px solid var(--ink);border-radius:12px;box-shadow:3px 3px 0 var(--ink);
-    padding:12px 14px;display:flex;flex-direction:column;gap:7px;}
-  .np .title{font-weight:700;font-size:16px;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  /* source / channel bar */
+  .sourcebar{display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;
+    background:var(--white);border:2px solid var(--ink);border-radius:11px;box-shadow:3px 3px 0 var(--ink);
+    padding:7px 12px;color:var(--ink);cursor:pointer;font-size:13px;}
+  .sourcebar:active{transform:translate(2px,2px);box-shadow:0 0 0 var(--ink);}
+  .sourcebar .lbl{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .sourcebar .lbl b{font-weight:700;}
+  .sourcebar .caret{font-size:14px;opacity:.7;}
+
+  /* now playing row */
+  .nprow{display:flex;gap:8px;align-items:stretch;}
+  .np{flex:1;min-width:0;background:var(--white);border:2px solid var(--ink);border-radius:12px;box-shadow:3px 3px 0 var(--ink);
+    padding:9px 12px;display:flex;flex-direction:column;justify-content:center;gap:5px;}
+  .np .title{font-weight:700;font-size:15px;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .np .artist{font-size:12px;color:var(--ink2);text-transform:uppercase;letter-spacing:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-  .progress{display:flex;align-items:center;gap:9px;font-family:'VT323',monospace;font-size:16px;color:var(--ink2);margin-top:2px;}
+  .progress{display:flex;align-items:center;gap:8px;font-family:'VT323',monospace;font-size:15px;color:var(--ink2);margin-top:1px;}
   .bar{flex:1;height:6px;border-radius:99px;background:#e0d4bb;border:1.5px solid var(--ink);position:relative;cursor:pointer;}
   .bar .fill{position:absolute;left:0;top:0;bottom:0;border-radius:99px;background:var(--ink);width:0%;}
-  .bar .knob{position:absolute;top:50%;width:13px;height:13px;border-radius:50%;background:var(--white);
-    border:2px solid var(--ink);transform:translate(-50%,-50%);left:0%;}
+  .bar .knob{position:absolute;top:50%;width:13px;height:13px;border-radius:50%;background:var(--white);border:2px solid var(--ink);transform:translate(-50%,-50%);left:0%;}
+  .sidebtns{display:flex;flex-direction:column;gap:8px;flex:0 0 auto;}
+  .sidebtns .sqbtn{flex:1;height:auto;min-width:46px;width:46px;}
 
-  /* cassette-deck transport */
-  .transport{display:flex;align-items:stretch;justify-content:center;gap:11px;}
+  /* transport */
+  .transport{display:flex;align-items:center;justify-content:center;gap:9px;}
   .keys{display:flex;border:2px solid var(--ink);border-radius:12px;overflow:hidden;box-shadow:3px 3px 0 var(--ink);}
-  .key{width:58px;height:50px;display:flex;align-items:center;justify-content:center;background:var(--paper3);
+  .key{width:52px;height:44px;display:flex;align-items:center;justify-content:center;background:var(--paper3);
     border:none;border-right:2px solid var(--ink);color:var(--ink);cursor:pointer;padding:0;}
   .key:last-child{border-right:none;}
   .key:active{filter:brightness(.93);}
   .key.active{background:var(--pink);}
   .key.active.pause{background:#d8cdb8;}
   .key svg{display:block;}
-  .deck-grille{width:62px;border:2px solid var(--ink);border-radius:11px;overflow:hidden;background:#0c0a08;
-    box-shadow:inset 0 0 12px rgba(0,0,0,.8);position:relative;}
+  .deck-grille{width:56px;height:44px;border:2px solid var(--ink);border-radius:11px;overflow:hidden;background:#0c0a08;
+    box-shadow:inset 0 0 12px rgba(0,0,0,.8);position:relative;flex:0 0 auto;}
   #sceneCanvas{position:absolute;inset:0;width:100%;height:100%;display:block;}
 
-  .volrow{display:flex;align-items:center;gap:10px;color:var(--ink2);font-size:13px;padding:0 4px;}
-  .volrow input{flex:1;-webkit-appearance:none;appearance:none;height:6px;border-radius:99px;background:#e0d4bb;border:1.5px solid var(--ink);outline:none;}
-  .volrow input::-webkit-slider-thumb{-webkit-appearance:none;width:15px;height:15px;border-radius:4px;background:var(--paper3);border:2px solid var(--ink);cursor:pointer;}
-  .volrow input::-moz-range-thumb{width:15px;height:15px;border-radius:4px;background:var(--paper3);border:2px solid var(--ink);cursor:pointer;}
-
   /* launcher tiles */
-  .nav{display:flex;gap:9px;margin-top:2px;}
+  .nav{display:flex;gap:7px;margin-top:0;}
   .nav button{flex:1;background:var(--paper3);border:2px solid var(--ink);border-radius:12px;color:var(--ink);
-    font-family:'Space Mono',monospace;font-weight:700;font-size:10px;letter-spacing:1px;padding:10px 4px 8px;
+    font-family:'Space Mono',monospace;font-weight:700;font-size:9px;letter-spacing:.5px;padding:7px 2px 5px;
     cursor:pointer;box-shadow:3px 3px 0 var(--ink);text-transform:uppercase;display:flex;flex-direction:column;align-items:center;gap:5px;}
   .nav button:active{transform:translate(2px,2px);box-shadow:0 0 0 var(--ink);}
   .nav button.active{background:var(--amber);}
@@ -140,7 +142,7 @@
   .drawer-head{display:flex;align-items:center;justify-content:space-between;padding:15px 18px 8px;}
   .drawer-head h3{margin:0;font-family:'DM Serif Display',serif;font-size:22px;}
   .drawer-head .x{background:var(--paper3);border:2px solid var(--ink);width:34px;height:34px;border-radius:9px;color:var(--ink);font-size:16px;cursor:pointer;box-shadow:2px 2px 0 var(--ink);}
-  .drawer-body{overflow-y:auto;padding:4px 12px 26px;-webkit-overflow-scrolling:touch;}
+  .drawer-body{overflow-y:auto;overscroll-behavior:contain;padding:4px 12px 26px;-webkit-overflow-scrolling:touch;}
   .searchbox{padding:4px 16px 12px;}
   .searchbox input{width:100%;background:var(--white);border:2px solid var(--ink);border-radius:11px;padding:11px 14px;color:var(--ink);font-family:'Space Mono',monospace;font-size:15px;outline:none;box-shadow:inset 2px 2px 0 rgba(28,24,19,.07);}
   .searchbox input::placeholder{color:#9a8b70;}
@@ -161,7 +163,6 @@
   .btn{width:100%;background:var(--amber);color:var(--ink);border:2px solid var(--ink);border-radius:12px;padding:14px;
     font-family:'Archivo Black',sans-serif;font-size:14px;letter-spacing:1px;cursor:pointer;box-shadow:4px 4px 0 var(--ink);}
   .btn:active{transform:translate(2px,2px);box-shadow:2px 2px 0 var(--ink);}
-
   .toast{position:fixed;z-index:40;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);background:var(--ink);color:var(--paper3);padding:11px 18px;border-radius:10px;font-size:13px;opacity:0;transition:.3s;pointer-events:none;max-width:90vw;text-align:center;box-shadow:3px 3px 0 rgba(0,0,0,.25);}
   .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
   .hidden{display:none !important;}
@@ -183,40 +184,43 @@
   <div class="topbar">
     <button class="sqbtn" id="gearBtn" title="Settings">&#9881;</button>
     <div class="wordmark"><span class="logo">LIDO</span><span class="fm">fm</span></div>
-    <div class="toggle"><span class="led" id="led"></span><span class="tv">&#128250;</span></div>
+    <div class="toprt">
+      <button class="sqbtn" id="playToggle" title="Play / pause"><span class="led" id="led"></span>
+        <svg width="16" height="13" viewBox="0 0 16 13" fill="none" stroke="#1c1813" stroke-width="1.6"><rect x="1" y="1" width="14" height="9" rx="1.5"/><path d="M5 12h6"/></svg></button>
+      <button class="sqbtn" id="shuffleBtn" title="Shuffle">
+        <svg width="19" height="16" viewBox="0 0 19 16" fill="none" stroke="#1c1813" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M2 4h3l9 8h3"/><path d="M2 12h3l3-2.7"/><path d="M11 5.7 14 3"/><path d="M15 1l2 2-2 2"/><path d="M15 10l2 2-2 2"/></svg></button>
+    </div>
   </div>
 
   <div class="stage">
     <div class="hifi">
-      <!-- graphic emblem (was: ULTRA WARM SUMMER SOUND) -->
       <svg class="orn" viewBox="0 0 240 34" fill="none" stroke="#d9c7a3" stroke-width="2" stroke-linecap="round">
-        <path d="M30 28 Q120 8 210 28"/>
-        <line x1="20" y1="22" x2="34" y2="22"/><line x1="206" y1="22" x2="220" y2="22"/>
-        <g transform="translate(120 16)">
-          <circle r="5.5" fill="#d9c7a3" stroke="none"/>
-          <g stroke="#d9c7a3"><line x1="0" y1="-9" x2="0" y2="-13"/><line x1="9" y1="0" x2="13" y2="0"/><line x1="-9" y1="0" x2="-13" y2="0"/><line x1="6.4" y1="-6.4" x2="9.2" y2="-9.2"/><line x1="-6.4" y1="-6.4" x2="-9.2" y2="-9.2"/></g>
-        </g>
+        <line x1="46" y1="28" x2="194" y2="28"/>
+        <path d="M104 28 A16 16 0 0 1 136 28" fill="#d9c7a3" stroke="none"/>
+        <line x1="120" y1="5" x2="120" y2="1"/><line x1="137" y1="9" x2="140" y2="6"/><line x1="103" y1="9" x2="100" y2="6"/><line x1="150" y1="16" x2="154" y2="14"/><line x1="90" y1="16" x2="86" y2="14"/>
       </svg>
-
-      <!-- graphic badges (was: DIGITAL / BASS / STEREO words) -->
       <div class="badges">
         <span class="badge"><svg width="18" height="12" viewBox="0 0 18 12"><g fill="#cdbb98"><rect x="1" y="6" width="2.4" height="5"/><rect x="5" y="2" width="2.4" height="9"/><rect x="9" y="4" width="2.4" height="7"/><rect x="13" y="1" width="2.4" height="10"/></g></svg></span>
         <span class="badge hl"><svg width="22" height="12" viewBox="0 0 22 12"><path d="M1 6 Q4 -1 7 6 T13 6 T19 6" fill="none" stroke="#171310" stroke-width="2"/></svg></span>
         <span class="badge"><svg width="22" height="12" viewBox="0 0 22 12"><g fill="none" stroke="#cdbb98" stroke-width="1.6"><circle cx="6" cy="6" r="2.2"/><circle cx="16" cy="6" r="2.2"/><path d="M2 2 A6 6 0 0 0 2 10"/><path d="M20 2 A6 6 0 0 1 20 10"/></g></svg></span>
       </div>
-
-      <div class="cover" id="artWrap"><div class="ph" id="artPh"><span class="mk">L</span></div></div>
-
+      <div class="cover" id="artWrap"><div class="ph" id="artPh"><span class="mk">&#9835;</span></div></div>
       <div class="footstrip"><span class="dot"></span><span class="ln"></span><span class="dot"></span><span class="ln"></span><span class="dot"></span></div>
     </div>
 
-    <div class="np">
-      <div class="title" id="npTitle">LIDO FM</div>
-      <div class="artist" id="npArtist">connect spotify to begin</div>
-      <div class="progress">
-        <span id="curTime">0:00</span>
-        <div class="bar" id="seekBar"><div class="fill" id="seekFill"></div><div class="knob" id="seekKnob"></div></div>
-        <span id="durTime">0:00</span>
+    <button class="sourcebar" id="sourceBar"><span class="lbl">Source:&nbsp;<b id="sourceLabel">Lido FM</b></span><span class="caret">&#9662;</span></button>
+
+    <div class="nprow">
+      <div class="np">
+        <div class="title" id="npTitle">LIDO FM</div>
+        <div class="artist" id="npArtist">connect spotify to begin</div>
+        <div class="progress"><span id="curTime">0:00</span>
+          <div class="bar" id="seekBar"><div class="fill" id="seekFill"></div><div class="knob" id="seekKnob"></div></div>
+          <span id="durTime">0:00</span></div>
+      </div>
+      <div class="sidebtns">
+        <button class="sqbtn" id="likeBtn" title="Save to library"><svg id="likeIcon" width="19" height="19" viewBox="0 0 20 20"><path d="M10 17 C2 11 3 4 7.5 4 C9.3 4 10 5.4 10 5.4 C10 5.4 10.7 4 12.5 4 C17 4 18 11 10 17 Z" fill="none" stroke="#1c1813" stroke-width="1.7" stroke-linejoin="round"/></svg></button>
+        <button class="sqbtn" id="shareBtn" title="Open in Spotify"><svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="#1c1813" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M11 2h5v5"/><path d="M16 2 8 10"/><path d="M14 11v4a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h4"/></svg></button>
       </div>
     </div>
 
@@ -232,27 +236,21 @@
       </div>
     </div>
 
-    <div class="volrow"><span>&#128264;</span><input type="range" id="vol" min="0" max="100" value="80" /><span>&#128266;</span></div>
-
     <div class="nav">
-      <button data-tab="playlists" class="active">
-        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="#1c1813" stroke-width="1.7" stroke-linecap="round"><path d="M3 5h10M3 10h10M3 15h6"/><circle cx="16" cy="14" r="2.2" fill="#1c1813" stroke="none"/><path d="M18.2 14V8"/></svg>
-        Playlists
-      </button>
+      <button data-tab="player" class="active">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="#1c1813" stroke-width="1.6"><rect x="2" y="5" width="16" height="10" rx="2"/><circle cx="7" cy="10" r="2.1"/><circle cx="13" cy="10" r="2.1"/></svg>Player</button>
+      <button data-tab="playlists">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="#1c1813" stroke-width="1.7" stroke-linecap="round"><path d="M3 5h10M3 10h10M3 15h6"/><circle cx="16" cy="14" r="2.2" fill="#1c1813" stroke="none"/><path d="M18.2 14V8"/></svg>Mixtapes</button>
       <button data-tab="library">
-        <svg width="20" height="20" viewBox="0 0 20 20"><path d="M10 17 C2 11 3 4 7.5 4 C9.3 4 10 5.4 10 5.4 C10 5.4 10.7 4 12.5 4 C17 4 18 11 10 17 Z" fill="none" stroke="#1c1813" stroke-width="1.7" stroke-linejoin="round"/></svg>
-        Library
-      </button>
+        <svg width="20" height="20" viewBox="0 0 20 20"><path d="M10 17 C2 11 3 4 7.5 4 C9.3 4 10 5.4 10 5.4 C10 5.4 10.7 4 12.5 4 C17 4 18 11 10 17 Z" fill="none" stroke="#1c1813" stroke-width="1.7" stroke-linejoin="round"/></svg>Library</button>
       <button data-tab="search">
-        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="#1c1813" stroke-width="1.8" stroke-linecap="round"><circle cx="9" cy="9" r="5"/><path d="M13 13l4 4"/></svg>
-        Search
-      </button>
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="#1c1813" stroke-width="1.8" stroke-linecap="round"><circle cx="9" cy="9" r="5"/><path d="M13 13l4 4"/></svg>Search</button>
     </div>
   </div>
 </div>
 
 <div class="drawer" id="drawer">
-  <div class="drawer-head"><h3 id="drawerTitle">Playlists</h3><button class="x" id="drawerClose">&#10005;</button></div>
+  <div class="drawer-head"><h3 id="drawerTitle">Mixtapes</h3><button class="x" id="drawerClose">&#10005;</button></div>
   <div class="searchbox hidden" id="searchBox"><input id="searchInput" placeholder="search songs, artists&#8230;" /></div>
   <div class="drawer-body" id="drawerBody"><div class="muted">Loading&#8230;</div></div>
 </div>
@@ -270,12 +268,12 @@
 
 <script>
 "use strict";
-const SCOPES = ["streaming","user-read-email","user-read-private","user-read-playback-state","user-modify-playback-state","playlist-read-private","playlist-read-collaborative","user-library-read"].join(" ");
+const SCOPES=["streaming","user-read-email","user-read-private","user-read-playback-state","user-modify-playback-state","playlist-read-private","playlist-read-collaborative","user-library-read","user-library-modify"].join(" ");
 const AUTH_URL="https://accounts.spotify.com/authorize";
 const TOKEN_URL="https://accounts.spotify.com/api/token";
 const API="https://api.spotify.com/v1";
 const REDIRECT_URI=window.location.origin+window.location.pathname;
-const CLIENT_ID="333157a23f5c43e2a2b11edad1386515"; // public PKCE client id (safe to embed)
+const CLIENT_ID="333157a23f5c43e2a2b11edad1386515";
 
 const $=(id)=>document.getElementById(id);
 const store={
@@ -285,6 +283,7 @@ const store={
 };
 let player=null, deviceId=null, token=null;
 let isPlaying=false, curMs=0, durMs=0, lastTick=0, seeking=false;
+let curTrackId=null, isLiked=false, shuffleOn=false;
 
 let toastT;
 function toast(m){ const t=$("toast"); t.textContent=m; t.classList.add("show"); clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove("show"),2600); }
@@ -294,24 +293,21 @@ async function sha256(s){ return await crypto.subtle.digest("SHA-256", new TextE
 function b64url(buf){ return btoa(String.fromCharCode(...new Uint8Array(buf))).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,""); }
 
 async function beginAuth(){
-  const verifier=randString(56);
-  const challenge=b64url(await sha256(verifier));
-  const state=randString(8);
-  sessionStorage.setItem("lido_verifier",verifier);
-  sessionStorage.setItem("lido_state",state);
-  const p=new URLSearchParams({ client_id:CLIENT_ID, response_type:"code", redirect_uri:REDIRECT_URI, code_challenge_method:"S256", code_challenge:challenge, state, scope:SCOPES });
+  const verifier=randString(56), challenge=b64url(await sha256(verifier)), state=randString(8);
+  sessionStorage.setItem("lido_verifier",verifier); sessionStorage.setItem("lido_state",state);
+  const p=new URLSearchParams({client_id:CLIENT_ID,response_type:"code",redirect_uri:REDIRECT_URI,code_challenge_method:"S256",code_challenge:challenge,state,scope:SCOPES});
   window.location.href=`${AUTH_URL}?${p.toString()}`;
 }
 async function exchangeCode(code){
   const verifier=sessionStorage.getItem("lido_verifier");
-  const body=new URLSearchParams({ client_id:CLIENT_ID, grant_type:"authorization_code", code, redirect_uri:REDIRECT_URI, code_verifier:verifier });
+  const body=new URLSearchParams({client_id:CLIENT_ID,grant_type:"authorization_code",code,redirect_uri:REDIRECT_URI,code_verifier:verifier});
   const r=await fetch(TOKEN_URL,{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},body});
   if(!r.ok) throw new Error("Token exchange failed: "+(await r.text()));
   saveToken(await r.json());
 }
 async function refreshToken(){
   const t=store.tok; if(!t||!t.refresh_token) return false;
-  const body=new URLSearchParams({ client_id:CLIENT_ID, grant_type:"refresh_token", refresh_token:t.refresh_token });
+  const body=new URLSearchParams({client_id:CLIENT_ID,grant_type:"refresh_token",refresh_token:t.refresh_token});
   const r=await fetch(TOKEN_URL,{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},body});
   if(!r.ok){ store.clear(); return false; }
   const j=await r.json(); if(!j.refresh_token) j.refresh_token=t.refresh_token; saveToken(j); return true;
@@ -321,17 +317,17 @@ async function ensureToken(){ const t=store.tok; if(!t) return false; if(Date.no
 
 async function api(path,opts={}){
   if(!(await ensureToken())) throw new Error("no token");
-  const r=await fetch(path.startsWith("http")?path:API+path,{ ...opts, headers:{ Authorization:"Bearer "+token, "Content-Type":"application/json", ...(opts.headers||{}) } });
+  const r=await fetch(path.startsWith("http")?path:API+path,{...opts,headers:{Authorization:"Bearer "+token,"Content-Type":"application/json",...(opts.headers||{})}});
   if(r.status===401){ if(await refreshToken()) return api(path,opts); }
   if(r.status===204) return null;
-  if(!r.ok) throw new Error(`API ${r.status}: ${await r.text()}`);
+  if(!r.ok){ const e=new Error("API "+r.status); e.status=r.status; throw e; }
   const ct=r.headers.get("content-type")||""; return ct.includes("json")?r.json():null;
 }
 
 window.onSpotifyWebPlaybackSDKReady=()=>{};
 function initPlayer(){
   if(player) return;
-  player=new Spotify.Player({ name:"Lido FM", getOAuthToken:cb=>ensureToken().then(()=>cb(token)), volume:($("vol").value/100) });
+  player=new Spotify.Player({name:"Lido FM",getOAuthToken:cb=>ensureToken().then(()=>cb(token)),volume:0.85});
   player.addListener("ready",({device_id})=>{ deviceId=device_id; transferPlayback(false); toast("Lido FM is ready ☀"); });
   player.addListener("not_ready",()=>{ deviceId=null; });
   player.addListener("initialization_error",({message})=>toast("Init error: "+message));
@@ -344,29 +340,57 @@ function onState(s){
   if(!s) return;
   const tr=s.track_window.current_track;
   durMs=s.duration; curMs=s.position; lastTick=Date.now(); isPlaying=!s.paused;
-  $("playBtn").classList.toggle("active", isPlaying);
-  $("pauseBtn").classList.toggle("active", !isPlaying);
-  $("led").classList.toggle("on", isPlaying);
+  $("playBtn").classList.toggle("active",isPlaying);
+  $("pauseBtn").classList.toggle("active",!isPlaying);
+  $("led").classList.toggle("on",isPlaying);
+  shuffleOn=!!s.shuffle; $("shuffleBtn").classList.toggle("on",shuffleOn);
   setNowPlaying(tr);
+  if(tr && tr.id!==curTrackId){ curTrackId=tr.id; refreshLike(); }
 }
 function setNowPlaying(tr){
   if(!tr) return;
   $("npTitle").textContent=tr.name;
   $("npArtist").textContent=(tr.artists||[]).map(a=>a.name).join(", ");
-  const url=tr.album?.images?.[0]?.url;
+  const url=tr.album&&tr.album.images&&tr.album.images[0]&&tr.album.images[0].url;
   if(url) $("artWrap").innerHTML=`<img src="${url}" alt="art" />`;
   document.title=tr.name+" — Lido FM";
 }
 async function transferPlayback(play){ if(!deviceId) return; try{ await api("/me/player",{method:"PUT",body:JSON.stringify({device_ids:[deviceId],play:!!play})}); }catch(e){} }
 
-async function playContext(uri){
+function togglePlay(){ if(!deviceId){ toast("Player warming up…"); return; } player.togglePlay().catch(()=>{}); }
+async function playContext(uri,name){
   if(!deviceId){ toast("Player not ready"); return; }
   const body=uri.includes(":track:")?{uris:[uri]}:{context_uri:uri};
-  try{ await api(`/me/player/play?device_id=${deviceId}`,{method:"PUT",body:JSON.stringify(body)}); closeDrawer(); }catch(e){ toast("Couldn't start playback"); }
+  try{ await api(`/me/player/play?device_id=${deviceId}`,{method:"PUT",body:JSON.stringify(body)}); if(name) setSource(name); closeDrawer(); }catch(e){ toast("Couldn't start playback"); }
 }
-async function playTracks(uris,offset=0){
+async function playTracks(uris,offset,name){
   if(!deviceId){ toast("Player not ready"); return; }
-  try{ await api(`/me/player/play?device_id=${deviceId}`,{method:"PUT",body:JSON.stringify({uris,offset:{position:offset}})}); closeDrawer(); }catch(e){ toast("Couldn't start playback"); }
+  try{ await api(`/me/player/play?device_id=${deviceId}`,{method:"PUT",body:JSON.stringify({uris,offset:{position:offset||0}})}); if(name) setSource(name); closeDrawer(); }catch(e){ toast("Couldn't start playback"); }
+}
+function setSource(name){ $("sourceLabel").textContent=name; }
+
+async function toggleShuffle(){
+  if(!deviceId){ toast("Player not ready"); return; }
+  shuffleOn=!shuffleOn; $("shuffleBtn").classList.toggle("on",shuffleOn);
+  try{ await api(`/me/player/shuffle?state=${shuffleOn}&device_id=${deviceId}`,{method:"PUT"}); }catch(e){ toast("Shuffle unavailable"); }
+}
+function setLikeIcon(on){ const p=$("likeIcon").querySelector("path"); if(p){ p.setAttribute("fill", on?"var(--like)":"none"); p.setAttribute("stroke", on?"var(--like)":"#1c1813"); } }
+async function refreshLike(){
+  if(!curTrackId){ return; }
+  try{ const r=await api(`/me/tracks/contains?ids=${curTrackId}`); isLiked=Array.isArray(r)&&r[0]===true; setLikeIcon(isLiked); }
+  catch(e){ setLikeIcon(false); }
+}
+async function toggleLike(){
+  if(!curTrackId){ toast("Nothing playing"); return; }
+  const next=!isLiked;
+  try{
+    await api(`/me/tracks?ids=${curTrackId}`,{method: next?"PUT":"DELETE"});
+    isLiked=next; setLikeIcon(isLiked); toast(isLiked?"Saved to your Library ♥":"Removed from Library");
+  }catch(e){ if(e.status===403){ toast("Tap ⚙ to reconnect and enable saving"); } else { toast("Couldn't update Library"); } }
+}
+function shareTrack(){
+  if(!curTrackId){ toast("Nothing playing"); return; }
+  window.open("https://open.spotify.com/track/"+curTrackId,"_blank");
 }
 
 function fmt(ms){ ms=Math.max(0,ms); const s=Math.floor(ms/1000); return Math.floor(s/60)+":"+("0"+(s%60)).slice(-2); }
@@ -384,11 +408,13 @@ setInterval(()=>{
   bar.addEventListener("touchstart",down,{passive:true}); window.addEventListener("touchmove",move,{passive:true}); window.addEventListener("touchend",up);
 })();
 
-let currentTab="playlists";
+let currentTab="player";
 function openDrawer(tab){
+  if(tab==="player"){ closeDrawer(); document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.tab==="player")); return; }
   currentTab=tab;
   document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.tab===tab));
-  $("drawerTitle").textContent=tab.charAt(0).toUpperCase()+tab.slice(1);
+  const titles={playlists:"Mixtapes",library:"Library",search:"Search"};
+  $("drawerTitle").textContent=titles[tab]||tab;
   $("searchBox").classList.toggle("hidden",tab!=="search");
   $("drawer").classList.add("open");
   if(tab==="playlists") loadPlaylists();
@@ -400,7 +426,7 @@ function rowHtml(img,name,sub,icon){ const art=img?`<img src="${img}" alt="">`:`
 function esc(s){ return (s||"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
 
 async function loadPlaylists(){
-  const body=$("drawerBody"); body.innerHTML='<div class="muted">Loading playlists…</div>';
+  const body=$("drawerBody"); body.innerHTML='<div class="muted">Loading mixtapes…</div>';
   try{
     const d=await api("/me/playlists?limit=50");
     const items=(d.items||[]).filter(Boolean);
@@ -411,10 +437,10 @@ async function loadPlaylists(){
       const total=pl.tracks&&typeof pl.tracks.total==="number"?pl.tracks.total:0;
       const owner=(pl.owner&&pl.owner.display_name)||"Spotify";
       el.innerHTML=rowHtml(pl.images&&pl.images[0]&&pl.images[0].url, pl.name||"Untitled", `${total} tracks · ${owner}`, "☰");
-      el.firstChild.addEventListener("click",()=>playContext(pl.uri));
+      el.firstChild.addEventListener("click",()=>playContext(pl.uri, pl.name||"Mixtape"));
       body.appendChild(el.firstChild);
     }catch(_){} });
-  }catch(e){ body.innerHTML='<div class="muted">Couldn\'t load playlists.</div>'; }
+  }catch(e){ body.innerHTML='<div class="muted">Couldn\'t load mixtapes.</div>'; }
 }
 async function loadLibrary(){
   const body=$("drawerBody"); body.innerHTML='<div class="muted">Loading saved songs…</div>';
@@ -428,7 +454,7 @@ async function loadLibrary(){
       const tr=i.track; const imgs=(tr.album&&tr.album.images)||[];
       const el=document.createElement("div");
       el.innerHTML=rowHtml((imgs[2]&&imgs[2].url)||(imgs[0]&&imgs[0].url), tr.name||"Untitled", (tr.artists||[]).map(a=>a.name).join(", "), "♪");
-      el.firstChild.addEventListener("click",()=>playTracks(uris,idx));
+      el.firstChild.addEventListener("click",()=>playTracks(uris,idx,"Library"));
       body.appendChild(el.firstChild);
     }catch(_){} });
   }catch(e){ body.innerHTML='<div class="muted">Couldn\'t load library.</div>'; }
@@ -438,7 +464,7 @@ function onSearchInput(){ clearTimeout(searchT); const q=$("searchInput").value.
 async function runSearch(q){
   const body=$("drawerBody"); body.innerHTML='<div class="muted">Searching…</div>';
   try{
-    const d=await api(`/search?type=track&limit=30&q=${encodeURIComponent(q)}`);
+    const d=await api(`/search?q=${encodeURIComponent(q)}&type=track`);
     const items=((d.tracks&&d.tracks.items)||[]).filter(Boolean);
     if(!items.length){ body.innerHTML='<div class="muted">No results.</div>'; return; }
     body.innerHTML="";
@@ -446,7 +472,7 @@ async function runSearch(q){
       const imgs=(tr.album&&tr.album.images)||[];
       const el=document.createElement("div");
       el.innerHTML=rowHtml((imgs[2]&&imgs[2].url)||(imgs[0]&&imgs[0].url), tr.name||"Untitled", (tr.artists||[]).map(a=>a.name).join(", "), "♪");
-      el.firstChild.addEventListener("click",()=>playContext(tr.uri));
+      el.firstChild.addEventListener("click",()=>playContext(tr.uri, (tr.artists&&tr.artists[0]&&tr.artists[0].name)||"Search"));
       body.appendChild(el.firstChild);
     }catch(_){} });
   }catch(e){ body.innerHTML='<div class="muted">Search failed.</div>'; }
@@ -480,11 +506,15 @@ function loadWeather(){ if(!navigator.geolocation) return; navigator.geolocation
 
 $("connectBtn").addEventListener("click",beginAuth);
 $("gearBtn").addEventListener("click",()=>{ if(confirm("Disconnect Spotify?")){ store.clear(); location.reload(); } });
+$("playToggle").addEventListener("click",togglePlay);
+$("shuffleBtn").addEventListener("click",toggleShuffle);
+$("likeBtn").addEventListener("click",toggleLike);
+$("shareBtn").addEventListener("click",shareTrack);
+$("sourceBar").addEventListener("click",()=>openDrawer("playlists"));
 $("playBtn").addEventListener("click",()=>{ if(!deviceId){ toast("Player warming up…"); return; } player.resume(); });
 $("pauseBtn").addEventListener("click",()=>{ if(!deviceId){ toast("Player warming up…"); return; } player.pause(); });
 $("prevBtn").addEventListener("click",()=>player&&player.previousTrack());
 $("nextBtn").addEventListener("click",()=>player&&player.nextTrack());
-$("vol").addEventListener("input",e=>{ if(player) player.setVolume(e.target.value/100); });
 document.querySelectorAll(".nav button").forEach(b=>b.addEventListener("click",()=>openDrawer(b.dataset.tab)));
 $("drawerClose").addEventListener("click",closeDrawer);
 $("searchInput").addEventListener("input",onSearchInput);
