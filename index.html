@@ -79,11 +79,12 @@
   .badge.hl{background:#e7d7b6;border-color:#e7d7b6;}
   .badge svg{display:block;}
   .cover{position:relative;width:100%;flex:1;min-height:0;border:2px solid #000;border-radius:8px;overflow:hidden;
+    isolation:isolate;transform:translateZ(0);-webkit-transform:translateZ(0);
     background:radial-gradient(120% 120% at 50% 30%, #2a2017, #110d09);box-shadow:inset 0 0 24px rgba(0,0,0,.7);}
-  .cover img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
-  .cover::after{content:"";position:absolute;inset:0;pointer-events:none;
+  .cover img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;border-radius:inherit;}
+  .cover::after{content:"";position:absolute;inset:0;pointer-events:none;border-radius:inherit;
     background-image:radial-gradient(rgba(0,0,0,.5) 0.6px, transparent 0.7px);background-size:3px 3px;mix-blend-mode:multiply;opacity:.45;}
-  .cover .ph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;}
+  .cover .ph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;border-radius:inherit;}
   .cover .ph .mk{font-family:'DM Serif Display',serif;font-size:40px;color:#5a4a35;transform:scaleY(1.15);opacity:.6;}
   .footstrip{display:flex;align-items:center;gap:6px;margin-top:4px;padding:0 2px;}
   .footstrip .ln{flex:1;height:0;border-top:1.5px dotted #5a4a35;opacity:.7;}
@@ -153,6 +154,10 @@
   .pinbtn{flex:0 0 auto;background:none;border:none;cursor:pointer;font-size:17px;padding:6px;line-height:1;opacity:.3;filter:grayscale(1);transition:opacity .15s,filter .15s,transform .15s;}
   .pinbtn:active{transform:scale(.85);}
   .pinbtn.on{opacity:1;filter:none;}
+  .seg{display:flex;gap:6px;margin-bottom:11px;}
+  .seg button{flex:1;background:var(--paper3);border:2px solid var(--ink);border-radius:9px;padding:7px 0;font-family:inherit;font-size:12px;font-weight:800;letter-spacing:.02em;color:var(--ink);cursor:pointer;transition:transform .08s;}
+  .seg button:active{transform:translate(1px,1px);}
+  .seg button.on{background:var(--amber);}
   .row .info .n{font-weight:700;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .row .info .s{font-size:12px;color:#7a6c55;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .muted{color:#8a7c64;font-size:13px;text-align:center;padding:30px 10px;}
@@ -462,22 +467,73 @@ async function loadPlaylists(){
     }catch(_){} });
   }catch(e){ body.innerHTML='<div class="muted">Couldn\'t load playlists.</div>'; }
 }
+let libTab="songs"; const libCache={};
 async function loadLibrary(){
-  const body=$("drawerBody"); body.innerHTML='<div class="muted">Loading saved songs…</div>';
+  const body=$("drawerBody");
+  body.innerHTML='<div class="seg" id="libSeg">'
+    +'<button data-lib="songs">Songs</button>'
+    +'<button data-lib="albums">Albums</button>'
+    +'<button data-lib="artists">Artists</button>'
+    +'</div><div id="libBody"></div>';
+  body.querySelectorAll("#libSeg button").forEach(b=>b.addEventListener("click",()=>{ libTab=b.dataset.lib; renderLibSeg(); renderLibTab(); }));
+  renderLibSeg(); renderLibTab();
+}
+function renderLibSeg(){ document.querySelectorAll("#libSeg button").forEach(b=>b.classList.toggle("on",b.dataset.lib===libTab)); }
+async function renderLibTab(){
+  const lb=$("libBody"); if(!lb) return;
+  lb.innerHTML='<div class="muted">Loading…</div>';
   try{
-    const d=await api("/me/tracks?limit=50");
-    const items=(d.items||[]).filter(i=>i&&i.track);
-    if(!items.length){ body.innerHTML='<div class="muted">No saved songs.</div>'; return; }
-    body.innerHTML="";
-    const uris=items.map(i=>i.track.uri);
-    items.forEach((i,idx)=>{ try{
-      const tr=i.track; const imgs=(tr.album&&tr.album.images)||[];
-      const el=document.createElement("div");
-      el.innerHTML=rowHtml((imgs[2]&&imgs[2].url)||(imgs[0]&&imgs[0].url), tr.name||"Untitled", (tr.artists||[]).map(a=>a.name).join(", "), "♪");
-      el.firstChild.addEventListener("click",()=>playTracks(uris,idx,"Library"));
-      body.appendChild(el.firstChild);
-    }catch(_){} });
-  }catch(e){ body.innerHTML='<div class="muted">Couldn\'t load library.</div>'; }
+    if(libTab==="albums") await renderLibAlbums(lb);
+    else if(libTab==="artists") await renderLibArtists(lb);
+    else await renderLibSongs(lb);
+  }catch(e){ lb.innerHTML='<div class="muted">Couldn\'t load.</div>'; }
+}
+async function getSavedTracks(){
+  if(libCache.tracks) return libCache.tracks;
+  const d=await api("/me/tracks?limit=50");
+  libCache.tracks=(d.items||[]).filter(i=>i&&i.track);
+  return libCache.tracks;
+}
+async function renderLibSongs(lb){
+  const items=await getSavedTracks();
+  if(!items.length){ lb.innerHTML='<div class="muted">No saved songs.</div>'; return; }
+  lb.innerHTML=""; const uris=items.map(i=>i.track.uri);
+  items.forEach((i,idx)=>{ try{
+    const tr=i.track; const imgs=(tr.album&&tr.album.images)||[];
+    const el=document.createElement("div");
+    el.innerHTML=rowHtml((imgs[2]&&imgs[2].url)||(imgs[0]&&imgs[0].url), tr.name||"Untitled", (tr.artists||[]).map(a=>a.name).join(", "), "♪");
+    el.firstChild.addEventListener("click",()=>playTracks(uris,idx,"Library"));
+    lb.appendChild(el.firstChild);
+  }catch(_){} });
+}
+async function renderLibAlbums(lb){
+  if(!libCache.albums){ const d=await api("/me/albums?limit=50"); libCache.albums=(d.items||[]).map(i=>i&&i.album).filter(Boolean); }
+  const albums=libCache.albums;
+  if(!albums.length){ lb.innerHTML='<div class="muted">No saved albums.</div>'; return; }
+  lb.innerHTML="";
+  albums.forEach(al=>{ try{
+    const imgs=al.images||[];
+    const el=document.createElement("div");
+    el.innerHTML=rowHtml((imgs[2]&&imgs[2].url)||(imgs[0]&&imgs[0].url), al.name||"Untitled", (al.artists||[]).map(a=>a.name).join(", "), "◉");
+    el.firstChild.addEventListener("click",()=>playContext(al.uri, al.name||"Album"));
+    lb.appendChild(el.firstChild);
+  }catch(_){} });
+}
+async function renderLibArtists(lb){
+  const items=await getSavedTracks();
+  const map=new Map();
+  items.forEach(i=>{ const al=i.track.album||{}; const img=((al.images&&(al.images[2]||al.images[0]))||{}).url;
+    (i.track.artists||[]).forEach(a=>{ if(!a||!a.id) return; const e=map.get(a.id)||{artist:a,count:0,img:img}; e.count++; if(!e.img) e.img=img; map.set(a.id,e); });
+  });
+  const arr=[...map.values()].sort((a,b)=> b.count-a.count || (a.artist.name||"").localeCompare(b.artist.name||""));
+  if(!arr.length){ lb.innerHTML='<div class="muted">No artists yet.</div>'; return; }
+  lb.innerHTML="";
+  arr.forEach(e=>{ try{
+    const el=document.createElement("div");
+    el.innerHTML=rowHtml(e.img, e.artist.name||"Unknown", e.count+(e.count===1?" song":" songs"), (e.artist.name||"?").slice(0,1).toUpperCase());
+    el.firstChild.addEventListener("click",()=>playContext(e.artist.uri, e.artist.name||"Artist"));
+    lb.appendChild(el.firstChild);
+  }catch(_){} });
 }
 let searchT;
 function onSearchInput(){ clearTimeout(searchT); const q=$("searchInput").value.trim(); if(!q){ $("drawerBody").innerHTML='<div class="muted">Type to search Spotify ☀</div>'; return; } searchT=setTimeout(()=>runSearch(q),350); }
