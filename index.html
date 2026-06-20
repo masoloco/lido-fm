@@ -244,6 +244,14 @@
           <button data-min="-1">End</button>
         </div>
       </div>
+      <div class="set-sec">
+        <div class="set-lbl">Repeat</div>
+        <div class="set-opts" id="repeatOpts">
+          <button data-rep="off">Off</button>
+          <button data-rep="context">All</button>
+          <button data-rep="track">One</button>
+        </div>
+      </div>
       <button class="set-disconnect" id="disconnectBtn">Disconnect Spotify</button>
     </div>
     <div class="wordmark"><span class="logo">SUNDECK</span><span class="fm">.fm</span></div>
@@ -347,7 +355,7 @@ const store={
 };
 let player=null, deviceId=null, token=null;
 let isPlaying=false, curMs=0, durMs=0, lastTick=0, seeking=false;
-let curTrackId=null, isLiked=false, shuffleOn=false;
+let curTrackId=null, isLiked=false, shuffleOn=false, repeatMode="off";
 let vizMode="dots"; try{ vizMode=localStorage.getItem("sundeck_viz")||"dots"; }catch(_){}
 let sleepTimer=null, sleepIdx=0; const SLEEP_OPTS=[0,15,30,60,-1];
 
@@ -410,6 +418,7 @@ function onState(s){
   $("pauseBtn").classList.toggle("active",!isPlaying);
   $("led").classList.toggle("on",isPlaying);
   shuffleOn=!!s.shuffle; $("shuffleBtn").classList.toggle("on",shuffleOn);
+  repeatMode=["off","context","track"][s.repeat_mode]||"off"; reflectRepeat();
   setNowPlaying(tr);
   if(tr && tr.id!==curTrackId){ curTrackId=tr.id; refreshLike(); }
 }
@@ -439,6 +448,13 @@ async function toggleShuffle(){
   if(!deviceId){ toast("Player not ready"); return; }
   shuffleOn=!shuffleOn; $("shuffleBtn").classList.toggle("on",shuffleOn);
   try{ await api(`/me/player/shuffle?state=${shuffleOn}&device_id=${deviceId}`,{method:"PUT"}); }catch(e){ toast("Shuffle unavailable"); }
+}
+function reflectRepeat(){ document.querySelectorAll("#repeatOpts button").forEach(b=>b.classList.toggle("on",b.dataset.rep===repeatMode)); }
+async function setRepeat(m){
+  if(!deviceId){ toast("Player not ready"); return; }
+  repeatMode=m; reflectRepeat();
+  const label={off:"Repeat off",context:"Repeat all",track:"Repeat one"}[m]||"Repeat";
+  try{ await api(`/me/player/repeat?state=${m}&device_id=${deviceId}`,{method:"PUT"}); toast(label); }catch(e){ toast("Repeat unavailable"); }
 }
 function setLikeIcon(on){ const p=$("likeIcon").querySelector("path"); if(p){ p.setAttribute("fill", on?"var(--like)":"none"); p.setAttribute("stroke", on?"var(--like)":"#1c1813"); } }
 async function refreshLike(){
@@ -747,6 +763,10 @@ function setSleep(m){
 }
 document.querySelectorAll("#sleepOpts button").forEach(b=>b.addEventListener("click",()=>setSleep(+b.dataset.min)));
 refreshSleepUI();
+
+/* repeat */
+document.querySelectorAll("#repeatOpts button").forEach(b=>b.addEventListener("click",()=>setRepeat(b.dataset.rep)));
+reflectRepeat();
 
 /* queue / up next */
 function qRow(tr,now){
